@@ -10,10 +10,9 @@ app.use(express.json())
 app.use(cors());
 
 
-
-
-
-
+// Auth router
+const authRouter = require('./routers/auth.router')
+app.use('/api', authRouter)
 
 
 

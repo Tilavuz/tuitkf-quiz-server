@@ -1,5 +1,6 @@
 const { generateToken } = require("../helpers/generate-token");
 const User = require("../models/user.model");
+const bcrypt = require('bcrypt')
 
 const login = async (req, res) => {
   try {
@@ -32,9 +33,9 @@ const register = async (req, res) => {
     let user = await User.findOne({ phone });
     if (user) res.status(409).json({ message: "Telefon raqam bazada mavjut!" });
 
-    const token = generateToken({ _id: user._id })
 
     user = await User.create({ phone, password, name });
+    const token = generateToken({ _id: user._id });
     user = await User.findById(user._id).select("-password");
 
     res.status(201).json({user, token});
