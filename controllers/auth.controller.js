@@ -24,27 +24,6 @@ const login = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
-  try {
-    const { phone, password, name } = req.body;
-    if (!phone || !password || !name)
-      return res
-        .status(400)
-        .json({ message: "Ro'yhatdan o'tish uchun malumot yetarli emas!" });
-
-    let user = await User.findOne({ phone });
-    if (user) return  res.status(409).json({ message: "Telefon raqam bazada mavjut!" });
-
-    user = await User.create({ phone, password, name });
-    const token = generateToken({ _id: user._id });
-    user = await User.findById(user._id).select("-password");
-
-    res.status(201).json({ user, token });
-  } catch (error) {
-    res.json({ message: error.message });
-  }
-};
-
 const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
@@ -54,4 +33,4 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUser };
+module.exports = { login, getUser };
