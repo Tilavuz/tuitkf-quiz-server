@@ -9,6 +9,7 @@ const UserSchema = new Schema({
   name: {
     type: String,
     maxlength: 30,
+    default: "Anonymous",
   },
   age: Number,
   phone: {
@@ -17,7 +18,7 @@ const UserSchema = new Schema({
   group: String,
   photo: {
     type: String,
-    default: "user-default-image.png",
+    default: "user-default-image.jpg",
   },
   password: {
     type: String,
