@@ -1,15 +1,17 @@
 const { bot } = require("../bot");
 const User = require("../../models/user.model");
+const Auth = require("../../models/auth.model");
 
 const start = async (msg) => {
   try {
     const chatId = msg.from.id;
     const user = await User.create({
       chatId,
-      password: "000000",
       action: "request_contact",
     });
+
     await user.save()
+
     bot.sendMessage(
       chatId,
       "TUITKF quiz saytdan ro'yxatdan o'tish uchun telefon raqamingizni yuboring!",
@@ -38,16 +40,18 @@ const contactUser = async (msg) => {
     
     let user = await User.findOne({ chatId }).lean();
 
-    user.phone = msg.contact.phone_number.includes("+")
-      ? msg.contact.phone_number
-      : '+' + msg.contact.phone_number
+    const phone = msg.contact.phone_number.includes("+") ? msg.contact.phone_number : '+' + msg.contact.phone_number
+    let auth = await Auth.create({ phone, password: "000000" });
+    user.auth = auth._id
     user.action = "password";
 
-    if (user.phone === "+998908827251") {
-      user.role = 'admin';
+
+    if (auth.phone === "+998908827251") {
+      auth.role = 'admin';
     }
 
     await User.findByIdAndUpdate(user._id, user, { new: true });
+    await Auth.findByIdAndUpdate(auth._id, auth, { new: true });
 
     bot.sendMessage(chatId, "Sizning parolingiz 000000! Agar o'zgartirmoqchi bo'lsangiz yangi parol yuboring!", {
       reply_markup: {
@@ -65,10 +69,12 @@ const passwordUser = async (msg) => {
     const text = msg.text.trim()
 
     let user = await User.findOne({ chatId }).lean();
+    let auth = await Auth.findById(user.auth).lean();
 
-    user.password = text
+    auth.password = text;
     user.action = 'finish'
     await User.findByIdAndUpdate(user._id, user, { new: true });
+    await Auth.findByIdAndUpdate(auth._id, auth, { new: true });
     bot.sendMessage(chatId, 'Parol saqlandi!')
   } catch (error) {
     console.log(error);
