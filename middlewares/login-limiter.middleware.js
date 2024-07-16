@@ -1,11 +1,11 @@
 const rateLimit = require('express-rate-limit')
 
 const loginLimiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
     max: 5,
     handler: (req, res) => {
         res.status(429).json({
-          message: "Parol esdan chiqqan bo'lsa adminga murojat qiling!",
+          message: "Sizning so'rovlaringiz blocklandi! 5 daqiqadan keyin qayta urinib ko'ring",
         });
     }
 })
