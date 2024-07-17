@@ -84,7 +84,10 @@ const passwordUser = async (msg) => {
     let user = await User.findOne({ chatId }).lean();
     let auth = await Auth.findById(user.auth).lean();
 
-    auth.password = text;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(text, salt);
+
+    auth.password = hashedPassword;
     user.action = 'finish'
     await User.findByIdAndUpdate(user._id, user, { new: true });
     await Auth.findByIdAndUpdate(auth._id, auth, { new: true });

@@ -16,7 +16,9 @@ app.use('/uploads', express.static('uploads'))
 const authRouter = require('./routers/auth.router')
 app.use('/api', authRouter)
 
-
+// User router
+const userRouter = require('./routers/user.router')
+app.use('/api', userRouter)
 
 
 const { port } = require("./helpers/shared");

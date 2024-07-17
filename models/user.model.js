@@ -25,11 +25,6 @@ const UserSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Auth',
     required: true
-  },
-  status: {
-    type: Boolean,
-    required: true,
-    default: true
   }
 });
 

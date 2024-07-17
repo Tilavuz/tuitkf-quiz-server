@@ -35,22 +35,24 @@ const changeUser = async (req, res) => {
   try {
     const { id } = req.params
     const { name, password, age, group, status } = req.body
+
     let user = await User.findById(id)
+    const rootAuth = await Auth.findById(req.user._id)
 
     if(!user) {
       res.status(404).json({ message: "Foydalanuvchi topilmadi!" })
     }
 
-    if(password) {
+    if (password || (typeof status === 'boolean' && rootAuth.role === 'admin')) {
       let auth = await Auth.findById(user.auth);
       if (password) auth.password = password;
+      if (typeof status === 'boolean') auth.status = status;
       await auth.save();
     }
 
     if(name) user.name = name
     if(age) user.age = age
     if (group) user.group = group;
-    if (status) user.status = status;
 
     if (req.file) {
       if (user.photo !== "user-default-image.jpg") {
@@ -80,6 +82,11 @@ const changeUser = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const auth = await Auth.findById(req.user._id).select("-password");
+
+    if(!auth.status) {
+      return res.status(403).json({ message: 'Blocklangan foydalanuvchi!' })
+    }
+
     const user = await User.findOne({ auth: auth._id }).populate({
       path: "auth",
       select: '-password'
