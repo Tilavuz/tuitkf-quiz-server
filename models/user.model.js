@@ -26,6 +26,6 @@ const UserSchema = new Schema({
     ref: 'Auth',
     required: true
   }
-});
+}, { timestamps: true });
 
 module.exports = model("User", UserSchema);
