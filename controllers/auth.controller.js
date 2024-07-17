@@ -34,18 +34,23 @@ const login = async (req, res) => {
 const changeUser = async (req, res) => {
   try {
     const { id } = req.params
-  
-    const { name, password } = req.body
+    const { name, password, age, group, status } = req.body
     let user = await User.findById(id)
 
     if(!user) {
       res.status(404).json({ message: "Foydalanuvchi topilmadi!" })
     }
 
-    let auth = await Auth.findById(user.auth)
+    if(password) {
+      let auth = await Auth.findById(user.auth);
+      if (password) auth.password = password;
+      await auth.save();
+    }
 
     if(name) user.name = name
-    if(password) auth.password = password
+    if(age) user.age = age
+    if (group) user.group = group;
+    if (status) user.status = status;
 
     if (req.file) {
       if (user.photo !== "user-default-image.jpg") {
@@ -60,9 +65,11 @@ const changeUser = async (req, res) => {
     }
 
     await user.save();
-    await auth.save();
 
-    user = await User.findById(user._id).populate('auth')
+    user = await User.findById(user._id).populate({
+      path: 'auth',
+      select: '-password'
+    })
     res.json(user)
   } catch (error) {
     console.log(error);
@@ -73,7 +80,10 @@ const changeUser = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const auth = await Auth.findById(req.user._id).select("-password");
-    const user = await User.findOne({ auth: auth._id }).populate('auth')
+    const user = await User.findOne({ auth: auth._id }).populate({
+      path: "auth",
+      select: '-password'
+    });
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
