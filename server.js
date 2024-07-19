@@ -20,6 +20,13 @@ app.use('/api', authRouter)
 const userRouter = require('./routers/user.router')
 app.use('/api', userRouter)
 
+// Science router
+const scienceRouter = require('./routers/science.router')
+app.use('/api', scienceRouter)
+
+// Question router
+const questionRouter = require('./routers/question.router')
+app.use('/api', questionRouter)
 
 const { port } = require("./helpers/shared");
 app.listen(port, () => {

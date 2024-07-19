@@ -34,7 +34,7 @@ const login = async (req, res) => {
 const changeUser = async (req, res) => {
   try {
     const { id } = req.params
-    const { name, password, age, group, status } = req.body
+    const { name, password, age, group, status, role } = req.body
 
     let user = await User.findById(id)
     const rootAuth = await Auth.findById(req.user._id)
@@ -43,9 +43,10 @@ const changeUser = async (req, res) => {
       res.status(404).json({ message: "Foydalanuvchi topilmadi!" })
     }
 
-    if (password || (typeof status === 'boolean' && rootAuth.role === 'admin')) {
+    if ((password || typeof status === 'boolean' || role) && rootAuth.role === 'admin') {
       let auth = await Auth.findById(user.auth);
       if (password) auth.password = password;
+      if (role) auth.role = role;
       if (typeof status === 'boolean') auth.status = status;
       await auth.save();
     }

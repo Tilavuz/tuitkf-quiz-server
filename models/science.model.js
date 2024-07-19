@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const ScienceSchema = new Schema(
+const scienceSchema = new Schema(
   {
     auth_id: {
       type: Schema.Types.ObjectId,
@@ -20,13 +20,18 @@ const ScienceSchema = new Schema(
       type: String,
       required: true,
     },
-    cource: {
+    course: {
       type: Number,
       enum: [1, 2, 3, 4],
+      required: true,
+    },
+    semester: {
+      type: Number,
+      enum: [1, 2],
       required: true,
     },
   },
   { timestamps: true }
 );
 
-module.exports = model("Science", ScienceSchema);
+module.exports = model("Science", scienceSchema);

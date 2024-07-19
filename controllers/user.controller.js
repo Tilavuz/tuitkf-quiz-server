@@ -9,7 +9,7 @@ const getUsers = async (req, res) => {
     const limit = parseInt(req.query.limit) || 15;
 
     if (auth.role !== "admin") {
-      res.json({ message: "Sizga bu huquq berilmagan" });
+      res.status(403).json({ message: "Sizga bu huquq berilmagan" });
     }
 
     const users = await User.find()
@@ -27,4 +27,25 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { getUsers };
+const getUser = async (req, res) => {
+  try {
+    const { id } = req.params
+    const auth_id = req.user._id;
+    const auth = await Auth.findById(auth_id);
+
+    if (auth.role !== "admin") {
+      res.json({ message: "Sizga bu huquq berilmagan" });
+    }
+
+    const user = await User.findById(id).populate({
+      path: "auth",
+      select: "-password",
+    });
+
+    res.json(user);
+  } catch (error) {
+    res.json({ message: error.message });
+  }
+};
+
+module.exports = { getUsers, getUser };
