@@ -5,7 +5,7 @@ const router = require('express').Router()
 
 
 
-router.get("/questions", auth, getQuestions);
+router.get("/questions/:id", auth, getQuestions);
 router.post("/questions/add", auth, createQuestion);
 router.delete("/questions/delete/:id", auth, removeQuestion);
 

@@ -55,8 +55,6 @@ const createQuestion = async (req, res) => {
   }
 };
 
-module.exports = createQuestion;
-
 
 const removeQuestion = async (req, res) => {
   try {
