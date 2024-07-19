@@ -50,20 +50,4 @@ const startTest = async (req, res) => {
   }
 };
 
-const checkAnswer = async (req, res) => {
-  try {
-    const { id } = req.params
-    const { value } = req.body
-    const question = await Question.findById(id)
-
-    if(question.correct_answer === value) {
-      return res.json({ status: true, question: question.question, answer: value });
-    }
-
-    res.json({ status: false, question: question.question, answer: value });
-  } catch (error) {
-    res.json({ message: error.message })
-  }
-}
-
-module.exports = { startTest, checkAnswer };
+module.exports = { startTest };
