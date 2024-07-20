@@ -36,6 +36,10 @@ app.use('/api', testRouter)
 const sessionRouter = require('./routers/session.router')
 app.use('/api', sessionRouter)
 
+// Session router
+const statisticsRouter = require('./routers/statistics.router')
+app.use('/api', statisticsRouter)
+
 const { port } = require("./helpers/shared");
 app.listen(port, () => {
     console.log(`server ${port}-portda ishga tushdi`);

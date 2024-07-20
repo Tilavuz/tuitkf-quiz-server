@@ -74,10 +74,14 @@ const removeQuestion = async (req, res) => {
       return;
     }
 
-    const { science_id } = await Question.findByIdAndDelete(id);
-    const questionCount = await Question.countDocuments({ science_id });
-    await Science.findByIdAndUpdate(science_id, { total: questionCount });
-    res.json({ message: "Malumot o'chirildi!" });
+    if(auth.role === 'admin') {
+      const { science_id } = await Question.findByIdAndDelete(id);
+      const questionCount = await Question.countDocuments({ science_id });
+      await Science.findByIdAndUpdate(science_id, { total: questionCount });
+      res.json({ message: "Malumot o'chirildi!" });
+    }
+
+    res.status(400).json({ message: 'Sizga admin qo\'shgan savollarni o\'chirish huquqi berilmagan!' })
   } catch (error) {
     res.json({ message: error.message });
   }

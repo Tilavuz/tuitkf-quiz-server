@@ -27,6 +27,11 @@ const sessionSchema = new Schema(
       required: true,
       default: 0,
     },
+    questions: {
+      type: Number,
+      required: true,
+      default: 0
+    }
   },
   { timestamps: true }
 );
