@@ -1,6 +1,7 @@
 const Science = require("../models/science.model");
 const Auth = require("../models/auth.model");
 const { Types } = require("mongoose");
+const Question = require("../models/question.model");
 
 const getSciences = async (req, res) => {
   try {
@@ -112,6 +113,7 @@ const removeScience = async (req, res) => {
 
     if (auth.role === "admin") {
       await Science.findByIdAndDelete(id);
+      await Question.deleteMany({ science_id: id })
       res.json({ message: "Malumot o'chirildi!" });
       return;
     }
@@ -121,6 +123,7 @@ const removeScience = async (req, res) => {
       new Types.ObjectId(science.auth_id).equals(new Types.ObjectId(auth._id))
     ) {
       await Science.findByIdAndDelete(id);
+      await Question.deleteMany({ science_id: id });
       res.json({ message: "Malumot o'chirildi" });
       return;
     } else {

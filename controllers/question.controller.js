@@ -1,6 +1,7 @@
 const Question = require("../models/question.model");
 const Auth = require("../models/auth.model");
 const Science = require("../models/science.model");
+const mammoth = require("mammoth");
 
 const getQuestions = async (req, res) => {
   try {
@@ -79,6 +80,7 @@ const removeQuestion = async (req, res) => {
       const questionCount = await Question.countDocuments({ science_id });
       await Science.findByIdAndUpdate(science_id, { total: questionCount });
       res.json({ message: "Malumot o'chirildi!" });
+      return
     }
 
     res.status(400).json({ message: 'Sizga admin qo\'shgan savollarni o\'chirish huquqi berilmagan!' })
@@ -87,4 +89,88 @@ const removeQuestion = async (req, res) => {
   }
 };
 
-module.exports = { createQuestion, getQuestions, removeQuestion };
+const readQuestionFile = async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ message: "Fayl tanlanmagan!" });
+    }
+
+    const result = await mammoth.extractRawText({ buffer: file.buffer });
+    const text = result.value;
+
+    const lines = text.split("\n").filter((line) => line.trim().length > 0);
+
+    const questions = [];
+    let currentQuestion = null;
+
+    lines.forEach((line) => {
+      if (line.startsWith("?")) {
+        if (currentQuestion) {
+          questions.push(currentQuestion);
+        }
+        currentQuestion = {
+          question: line.substring(1).trim(),
+          options: [],
+          correct_answer: null,
+        };
+      } else if (line.startsWith("+")) {
+        // + bilan boshlangan qatorlarni options ga qo'shish
+        if (currentQuestion) {
+          currentQuestion.options.push(line.substring(1).trim());
+          currentQuestion.correct_answer = line.substring(1).trim(); // Agar + to'g'ri javob bo'lsa
+        }
+      } else if (line.startsWith("-")) {
+        // - bilan boshlangan qatorlarni options ga qo'shish
+        if (currentQuestion) {
+          currentQuestion.options.push(line.substring(1).trim());
+        }
+      } else if (currentQuestion) {
+        currentQuestion.options.push(line.trim());
+      }
+    });
+
+    if (currentQuestion) {
+      questions.push(currentQuestion);
+    }
+
+    const auth_id = req.user._id;
+    const auth = await Auth.findById(auth_id);
+
+    if (auth.role !== "admin" && auth.role !== "teacher") {
+      return res.status(403).json({ message: "Sizga bu huquq berilmagan!" });
+    }
+
+    const science_id = req.params.id;
+
+    if (!science_id) {
+      return res.status(400).json({ message: "Science ID kerak!" });
+    }
+
+    for (const q of questions) {
+      await Question.create({
+        science_id,
+        question: q.question,
+        options: q.options,
+        correct_answer: q.correct_answer,
+        auth_id,
+      });
+
+      const questionCount = await Question.countDocuments({ science_id });
+      await Science.findByIdAndUpdate(science_id, { total: questionCount });
+    }
+
+    res.json({ message: "Savollar muvaffaqiyatli saqlandi!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports = {
+  createQuestion,
+  getQuestions,
+  removeQuestion,
+  readQuestionFile,
+};

@@ -1,4 +1,6 @@
 const Question = require("../models/question.model");
+const mongoose = require('mongoose')
+const {Types} = require('mongoose')
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -21,10 +23,10 @@ const startTest = async (req, res) => {
 
     if (random === "mix") {
       const allData = await Question.countDocuments({ science_id: id });
-
+      
       if (allData > 25) {
         questions = await Question.aggregate([
-          { $match: { science_id: id } },
+          { $match: { science_id: new Types.ObjectId(id) } },
           { $sample: { size: 25 } },
         ]);
       }else {
