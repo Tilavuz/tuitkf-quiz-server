@@ -36,9 +36,13 @@ app.use('/api', testRouter)
 const sessionRouter = require('./routers/session.router')
 app.use('/api', sessionRouter)
 
-// Session router
+// Statistics router
 const statisticsRouter = require('./routers/statistics.router')
 app.use('/api', statisticsRouter)
+
+// News router
+const newsRouter = require('./routers/news.router')
+app.use('/api', newsRouter)
 
 const { port } = require("./helpers/shared");
 app.listen(port, () => {
