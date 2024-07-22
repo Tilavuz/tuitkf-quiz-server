@@ -5,8 +5,8 @@ const createSession = async (req, res) => {
   try {
     const { id } = req.params;
     const { time, score, percent, questions } = req.body.session;
-    const { solutions } = req.body
-    
+    const { solutions } = req.body;
+
     const auth_id = req.user._id;
 
     if (time === null || score === null || percent === null) {
@@ -20,7 +20,7 @@ const createSession = async (req, res) => {
     if (session) {
       (session.time = time), (session.score = score);
       session.percent = percent;
-      session.questions = questions
+      session.questions = questions;
 
       await Solution.deleteMany({ session_id: session._id });
 
@@ -30,12 +30,13 @@ const createSession = async (req, res) => {
           return {
             ...solution,
             session_id: session._id,
-            questions
+            questions,
           };
         });
-        
+
         await Solution.insertMany(solutionsCreate);
       }
+      session = await Session.findById(session._id).populate('science_id')
       return res.json({ message: "Natija yangilandi!", session });
     }
 
@@ -45,7 +46,7 @@ const createSession = async (req, res) => {
       time,
       score,
       percent,
-      questions
+      questions,
     });
 
     if (solutions) {
@@ -58,6 +59,7 @@ const createSession = async (req, res) => {
       await Solution.insertMany(solutionsCreate);
     }
 
+    session = await Session.findById(session._id).populate('science_id')
     res.json({ message: "Natija saqlandi!", session });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -83,22 +85,22 @@ const removeSession = async (req, res) => {
 
 const getSolution = async (req, res) => {
   try {
-    const { id } = req.params
-    const solution = await Solution.find({ session_id: id })
-    res.json(solution)
+    const { id } = req.params;
+    const solution = await Solution.find({ session_id: id });
+    res.json(solution);
   } catch (error) {
-    res.json({ message: error.message })
+    res.json({ message: error.message });
   }
-}
+};
 
 const getSessions = async (req, res) => {
   try {
-    const auth_id = req.user._id
-    const sessions = await Session.find({ auth_id }).populate('science_id')
-    res.json(sessions)
+    const auth_id = req.user._id;
+    const sessions = await Session.find({ auth_id }).populate("science_id");
+    res.json(sessions);
   } catch (error) {
-    res.json({ message: error.message })
+    res.json({ message: error.message });
   }
-}
+};
 
 module.exports = { createSession, removeSession, getSessions, getSolution };
