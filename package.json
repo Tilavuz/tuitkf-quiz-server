@@ -12,6 +12,7 @@
 		"node-telegram-bot-api": "^0.66.0"
 	},
 	"scripts": {
-		"dev": "nodemon server.js"
+		"dev": "nodemon server.js",
+		"build": "node server.js"
 	}
 }
