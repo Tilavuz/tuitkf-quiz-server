@@ -13,6 +13,7 @@ const getUsers = async (req, res) => {
     }
 
     const users = await User.find()
+      .sort({ _id: -1 })
       .populate({ path: "auth", select: "-password" })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -29,7 +30,7 @@ const getUsers = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
     const auth_id = req.user._id;
     const auth = await Auth.findById(auth_id);
 

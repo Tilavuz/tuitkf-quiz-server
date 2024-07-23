@@ -9,6 +9,7 @@ const getSciences = async (req, res) => {
     const limit = parseInt(req.query.limit) || 15;
 
     const sciences = await Science.find()
+      .sort({ _id: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
     const countSciences = await Science.countDocuments();
@@ -24,14 +25,13 @@ const getSciences = async (req, res) => {
 
 const getScience = async (req, res) => {
   try {
-    const { id } = req.params
-    const science = await Science.findById(id)
-    res.json(science)
+    const { id } = req.params;
+    const science = await Science.findById(id);
+    res.json(science);
   } catch (error) {
     res.json({ message: error.message });
   }
 };
-
 
 const createScience = async (req, res) => {
   try {
@@ -113,7 +113,7 @@ const removeScience = async (req, res) => {
 
     if (auth.role === "admin") {
       await Science.findByIdAndDelete(id);
-      await Question.deleteMany({ science_id: id })
+      await Question.deleteMany({ science_id: id });
       res.json({ message: "Malumot o'chirildi!" });
       return;
     }
