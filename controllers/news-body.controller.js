@@ -24,7 +24,6 @@ const createNewsBody = async (req, res) => {
 
 const getNewsBody = async (req, res) => {
     try {
-        console.log(1);
         const { id } = req.params // news id
         const newsBody = await NewsBody.find({ news_id: id })
         res.json(newsBody)
