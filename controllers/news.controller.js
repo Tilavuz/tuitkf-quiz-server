@@ -68,14 +68,14 @@ const removeNews = async (req, res) => {
 
     if (auth.role === "admin") {
       await News.findByIdAndDelete(id);
-      await NewsBody.findOneAndDelete({ news_id: id });
+      await NewsBody.deleteMany({ news_id: id });
       res.json({ message: "Malumot o'chirildi!" });
       return;
     }
 
     if (auth.role === "teacher" && auth_id === news.auth_id.toString()) {
       await News.findByIdAndDelete(id);
-      await NewsBody.findOneAndDelete({ news_id: id });
+      await NewsBody.deleteMany({ news_id: id });
       res.json({ message: "Malumot o'chirildi!" });
       return;
     }
